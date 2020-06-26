@@ -1,4 +1,4 @@
-Role Name
+Role Name ![.github/workflows/linter.yml](https://github.com/victorsalaun/ansible-role-flux/workflows/.github/workflows/linter.yml/badge.svg)
 =========
 
 A brief description of the role goes here.
