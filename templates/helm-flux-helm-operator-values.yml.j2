@@ -1,0 +1,32 @@
+chartsSyncInterval: 1m
+configureRepositories:
+  enable: true
+  repositories:
+    - name: eks
+      url: https://aws.github.io/eks-charts
+    - name: stable
+      url: https://kubernetes-charts.storage.googleapis.com
+    - caFile: ""
+      cache: "{{ helm_flux_helm_operator_repositories_tlnd_helm_name }}-index.yaml"
+      certFile: ""
+      keyFile: ""
+      name: "{{ helm_flux_helm_operator_repositories_tlnd_helm_name }}"
+      url: "https://artifactory.datapwn.com/artifactory/{{ helm_flux_helm_operator_repositories_tlnd_helm_name }}"
+      username: "{{ helm_flux_helm_operator_repositories_tlnd_helm_username }}"
+      password: "{{ helm_flux_helm_operator_repositories_tlnd_helm_password }}"
+create: true
+git:
+  pollInterval: 1m
+  ssh:
+    secretName: flux-git-deploy
+logFormat: json
+resources:
+  limits:
+    cpu: 400m
+    memory: 1024Mi
+  requests:
+    cpu: 400m
+    memory: 1024Mi
+rbac:
+  create: true
+tillerNamespace: "{{ helm_flux_helm_operator_namespace }}"

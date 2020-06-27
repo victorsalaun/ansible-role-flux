@@ -1,2 +1,25 @@
 ---
-# tasks file for flux
+#- name: Helm | Flux | Add Repo FluxCD
+#  command: helm repo add fluxcd "https://charts.fluxcd.io"
+#
+#- name: Helm | Update repository local cache
+#  shell: helm repo update
+
+- name: Helm | Flux | Make configuration
+  template:
+    src: "helm-flux-values.yml.j2"
+    dest: helm_flux_values.yml
+
+- name: Kubernetes | Flux | Deploy git secret
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: flux-git-deploy
+        namespace: "{{ helm_flux_namespace }}"
+      type: Opaque
+      data:
+        identity: "{{ flux_git_deploy_pk }}"
+  when: flux_git_deploy_pk is defined

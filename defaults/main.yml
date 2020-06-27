@@ -1,2 +1,26 @@
 ---
-# defaults file for flux
+helm_flux_application_config_repository_git_url: git@github.com:Talend/application-flux-config.git
+helm_flux_chart_name: flux
+helm_flux_chart_repo: fluxcd/flux
+helm_flux_chart_version: "1.3.0"
+helm_flux_namespace: admin
+helm_flux_release_crd_version: helm-0.10.1
+helm_flux_repositories_values_file: '{{ kube_config_dir }}/{{ helm_flux_chart_name }}-repositories-values.yaml'
+helm_flux_tiller_namespace: admin
+
+helm_flux_helm_operator_chart_name: flux-helm-operator
+helm_flux_helm_operator_chart_repo: fluxcd/helm-operator
+helm_flux_helm_operator_chart_version: "1.0.1"
+helm_flux_helm_operator_crd: "https://raw.githubusercontent.com/fluxcd/helm-operator/chart-{{ helm_flux_helm_operator_chart_version }}/deploy/crds.yaml"
+helm_flux_helm_operator_namespace: admin
+helm_flux_helm_operator_repositories_tlnd_helm_name: tlnd-helm-dev
+
+helm_fluxcloud_application_config_repository_git_url: https://github.com/Talend/application-flux-config
+helm_fluxcloud_docker_image_tag: v0.3.9
+helm_fluxcloud_namespace: admin
+helm_fluxcloud_notification_slack_channel: "#flux-aws-dev"
+
+helm_sealed_secrets_chart_name: sealed-secrets
+helm_sealed_secrets_chart_repo: stable/sealed-secrets
+helm_sealed_secrets_chart_version: "1.5.0"
+helm_sealed_secrets_namespace: admin

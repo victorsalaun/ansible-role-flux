@@ -1,0 +1,42 @@
+additionalArgs:
+  - --connect=ws://fluxcloud
+clusterRole:
+  create: true
+syncGarbageCollection:
+  enabled: true
+git:
+  branch: master
+  label: "{{ cluster_name }}"
+  path: "{{ cluster_name }}"
+  pollInterval: 1m
+  url: "{{ helm_flux_application_config_repository_git_url }}"
+  secretName: flux-git-deploy
+logFormat: json
+memcached:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 628Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+rbac:
+  create: true
+registry:
+  pollInterval: 1m
+resources:
+  limits:
+    cpu: 400m
+    memory: 1024Mi
+  requests:
+    cpu: 400m
+    memory: 512Mi
+serviceAccount:
+  create: true
+# Optional DNS settings, configuring the ndots option may resolve
+# nslookup issues on some Kubernetes setups.
+#dnsPolicy: "None"
+dnsConfig:
+  options:
+    - name: ndots
+      value: "1"

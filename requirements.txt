@@ -1,1 +1,4 @@
+ansible==2.9.10
+docker-py==1.10.6
 molecule==3.0.4
+openshift==0.8.8
