@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  vars:
+    cluster_name: vsalaun
+
+  roles:
+    - role: ansible-role-flux
