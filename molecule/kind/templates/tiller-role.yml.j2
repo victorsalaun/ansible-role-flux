@@ -1,0 +1,19 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: admin
+  name: tiller
+
+rules:
+- apiGroups: ["", "extensions", "apps", "autoscaling", "batch",  "policy", "networking.k8s.io", "monitoring.coreos.com"] # "" indicates the core API group
+  resources: [ "*" ]
+  verbs: ["*"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings", "serviceaccounts"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["alertmanagers", "prometheuses", "prometheusrules", "servicemonitors"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["bitnami.com"]
+  resources: ["sealedsecrets"]
+  verbs: ["*"]
