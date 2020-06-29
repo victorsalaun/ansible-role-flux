@@ -1,0 +1,96 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Wait for the cluster to be ready
+      command: kubectl get nodes
+      register: nodes
+      until: nodes is succeeded
+      retries: 120
+      delay: 1
+
+    - name: Prepare cluster for Tiller
+      block:
+
+        - name: Tiller | Create admin namespace
+          command: kubectl create ns admin
+
+        - name: Tiller | Lay down Service Account template
+          template:
+            src: tiller-sa.yml.j2
+            dest: "tiller-sa.yml"
+
+        - name: Tiller | Apply Service Account
+          command: kubectl apply -f tiller-sa.yml
+
+        - name: Tiller | Lay down Cluster Role template
+          template:
+            src: tiller-clusterrole.yml.j2
+            dest: "tiller-clusterrole.yml"
+
+        - name: Tiller | Apply Cluster Role
+          command: kubectl apply -f tiller-clusterrole.yml
+
+        - name: Tiller | Lay down Cluster Role Binding template
+          template:
+            src: tiller-clusterrolebinding.yml.j2
+            dest: "tiller-clusterrolebinding.yml"
+
+        - name: Tiller | Apply Cluster Role Binding
+          command: kubectl apply -f tiller-clusterrolebinding.yml
+
+        - name: Tiller | Lay down Role template
+          template:
+            src: tiller-role.yml.j2
+            dest: "tiller-role.yml"
+
+        - name: Tiller | Apply Role
+          command: kubectl apply -f tiller-role.yml
+
+        - name: Tiller | Lay down Role Binding template
+          template:
+            src: tiller-rolebinding.yml.j2
+            dest: "tiller-rolebinding.yml"
+
+        - name: Tiller | Apply Role Binging
+          command: kubectl apply -f tiller-rolebinding.yml
+
+
+    - name: Install Helm
+      block:
+
+        - name: Install tar
+          apk:
+            name: tar
+            update_cache: yes
+
+        - name: Download helm
+          unarchive:
+            src: https://get.helm.sh/helm-v2.16.9-linux-arm64.tar.gz
+            dest: /tmp
+            copy: no
+
+        - name: Create the installation directory
+          file:
+            path: /opt/bin
+            state: directory
+
+        - name: Copy helm binary
+          copy:
+            src: /tmp/linux-arm64/helm
+            dest: /opt/bin
+            mode: 0755
+            remote_src: yes
+
+        - name: Create helm soft link
+          file:
+            src: /opt/bin/helm
+            dest: /usr/bin/helm
+            state: link
+
+    - name: Install Tiller
+      command: helm init --tiller-namespace admin --service-account tiller
