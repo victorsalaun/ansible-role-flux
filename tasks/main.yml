@@ -1,9 +1,9 @@
 ---
-#- name: Helm | Flux | Add Repo FluxCD
-#  command: helm repo add fluxcd "https://charts.fluxcd.io"
-#
-#- name: Helm | Update repository local cache
-#  shell: helm repo update
+- name: Helm | Flux | Add Repo FluxCD
+  command: helm repo add fluxcd "https://charts.fluxcd.io"
+
+- name: Helm | Update repository local cache
+  shell: helm repo update
 
 - name: Helm | Flux | Make configuration
   template:
@@ -23,3 +23,21 @@
       data:
         identity: "{{ flux_git_deploy_pk }}"
   when: flux_git_deploy_pk is defined
+
+- name: Helm | Flux | Install
+  shell: |
+    helm upgrade --install --wait \
+      -f helm_flux_values.yml \
+      --tiller-namespace {{ helm_flux_namespace }} \
+      --namespace {{ helm_flux_namespace }} \
+      {{ helm_flux_chart_name }} {{ helm_flux_chart_repo }} --version {{ helm_flux_chart_version }}
+
+- name: Helm | Flux | Identity
+  command: fluxctl identity --k8s-fwd-ns {{ helm_flux_namespace }}
+  register: ssh_rsa
+  until: ssh_rsa is succeeded
+  retries: 30
+  delay: 5
+
+- name: Helm | Flux | Print Git Deploy Key
+  debug: msg="{{ ssh_rsa.stdout }}"

@@ -17,8 +17,10 @@ configureRepositories:
 create: true
 git:
   pollInterval: 1m
+{% if flux_git_deploy_pk is defined %}
   ssh:
     secretName: flux-git-deploy
+{% endif %}
 logFormat: json
 resources:
   limits:

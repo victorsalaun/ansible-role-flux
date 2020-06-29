@@ -10,7 +10,9 @@ git:
   path: "{{ cluster_name }}"
   pollInterval: 1m
   url: "{{ helm_flux_application_config_repository_git_url }}"
+{% if flux_git_deploy_pk is defined %}
   secretName: flux-git-deploy
+{% endif %}
 logFormat: json
 memcached:
   resources:
