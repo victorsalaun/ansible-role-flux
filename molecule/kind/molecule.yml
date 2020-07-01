@@ -4,10 +4,10 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: kind-1.16
+  - name: kind-1.12
     groups:
       - k8s
-    image: bsycorp/kind:latest-1.16
+    image: bsycorp/kind:latest-1.12
     privileged: True
     override_command: no
     exposed_ports:
@@ -18,10 +18,13 @@ platforms:
     pre_build_image: yes
 provisioner:
   name: ansible
+  lint:
+    name: ansible-lint
   log: True
   env:
     K8S_AUTH_KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
     KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
     KIND_PORT: '${TEST_CLUSTER_PORT:-8443}'
+    OBJC_DISABLE_INITIALIZE_FORK_SAFETY: 'YES'
 verifier:
   name: ansible
