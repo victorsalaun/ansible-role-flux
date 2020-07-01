@@ -7,7 +7,7 @@
 
 - name: Helm | Flux | Make configuration
   template:
-    src: "helm-flux-values.yml.j2"
+    src: helm-flux-values.yml.j2
     dest: helm_flux_values.yml
 
 - name: Kubernetes | Flux | Deploy git secret
@@ -41,3 +41,127 @@
 
 - name: Helm | Flux | Print Git Deploy Key
   debug: msg="{{ ssh_rsa.stdout }}"
+
+- name: Kubernetes | Flux Helm Operator | Install Custom Resource Definition
+  k8s:
+    definition: "{{ item }}"
+  with_items: "{{ lookup('url', '{{ helm_flux_helm_operator_crd }}', split_lines=False) | from_yaml_all | list }}"
+
+- name: Helm | Flux Helm Operator | Make configuration
+  template:
+    src: helm-flux-helm-operator-values.yml.j2
+    dest: helm_flux_helm_operator_values.yml
+
+- name: Helm | Flux Helm Operator | Install
+  shell: |
+    helm upgrade --install --wait \
+      -f helm_flux_helm_operator_values.yml \
+      --tiller-namespace {{ helm_flux_helm_operator_namespace }} \
+      --namespace {{ helm_flux_helm_operator_namespace }} \
+      {{ helm_flux_helm_operator_chart_name }} {{ helm_flux_helm_operator_chart_repo }} --version {{ helm_flux_helm_operator_chart_version }}
+
+- name: Kubernetes | Fluxcloud | Install Service
+  k8s:
+    state: present
+    definition:
+      kind: Service
+      apiVersion: v1
+      metadata:
+        name: fluxcloud
+        namespace: "{{ helm_fluxcloud_namespace }}"
+      spec:
+        selector:
+          name: fluxcloud
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 3032
+  when:
+    - helm_fluxcloud_notification_slack_url is defined
+    - helm_fluxcloud_notification_slack_channel is defined
+    - helm_fluxcloud_application_config_repository_git_url is defined
+
+- name: Kubernetes | Fluxcloud | Install Deployment
+  k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: fluxcloud
+        namespace: "{{ helm_fluxcloud_namespace }}"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            name: fluxcloud
+        strategy:
+          type: Recreate
+        template:
+          metadata:
+            labels:
+              name: fluxcloud
+          spec:
+            securityContext:
+              runAsUser: 999
+            containers:
+              - name: fluxcloud
+                image: "justinbarrick/fluxcloud:{{ helm_fluxcloud_docker_image_tag }}"
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 3032
+                env:
+                  - name: SLACK_URL
+                    value: "{{ helm_fluxcloud_notification_slack_url }}"
+                  - name: SLACK_CHANNEL
+                    value: "{{ helm_fluxcloud_notification_slack_channel }}"
+                  - name: SLACK_USERNAME
+                    value: Flux Deployer
+                  - name: SLACK_ICON_EMOJI
+                    value: ":heart:"
+                  - name: GITHUB_URL
+                    value: "{{ helm_fluxcloud_application_config_repository_git_url }}"
+                  - name: LISTEN_ADDRESS
+                    value: ":3032"
+  when:
+    - helm_fluxcloud_notification_slack_url is defined
+    - helm_fluxcloud_notification_slack_channel is defined
+    - helm_fluxcloud_application_config_repository_git_url is defined
+
+- name: Helm | Sealed Secrets | Install Sealed Secret Key
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: kubernetes.io/tls
+      metadata:
+        name: sealed-secrets-key
+        generateName: sealed-secrets-key
+        namespace: "{{ helm_sealed_secrets_namespace }}"
+      data:
+        tls.crt: "{{ helm_sealed_secrets_tls_cert }}"
+        tls.key: "{{ helm_sealed_secrets_tls_key }}"
+  when:
+    - helm_sealed_secrets_tls_cert is defined
+    - helm_sealed_secrets_tls_key is defined
+
+- name: Helm | Sealed Secrets | Make configuration
+  template:
+    src: helm-flux-helm-operator-values.yml.j2
+    dest: helm_flux_helm_operator_values.yml
+
+- name: Helm | Sealed Secrets | Install
+  shell: |
+    helm upgrade --install --wait \
+      -f helm_flux_helm_operator_values.yml \
+      --tiller-namespace {{ helm_sealed_secrets_namespace }} \
+      --namespace {{ helm_sealed_secrets_namespace }} \
+      {{ helm_sealed_secrets_chart_name }} {{ helm_sealed_secrets_chart_repo }} --version {{ helm_sealed_secrets_chart_version }}
+
+- name: Helm | Sealed Secrets | Fetch Cert
+  command: kubeseal --fetch-cert -n {{ helm_flux_namespace }} --controller-namespace {{ helm_flux_namespace }} --controller-name {{ helm_sealed_secrets_chart_name }} > pub-cert.pem
+  register: cert
+
+- name: Helm | Sealed Secrets | Print Certificate to backup
+  debug: msg="{{ cert.stdout }}"

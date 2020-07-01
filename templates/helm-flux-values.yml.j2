@@ -17,22 +17,22 @@ logFormat: json
 memcached:
   resources:
     limits:
-      cpu: 100m
-      memory: 628Mi
+      cpu: {{ helm_flux_memcached_resources_limits_cpu }}
+      memory: {{ helm_flux_memcached_resources_limits_memory }}
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: {{ helm_flux_memcached_resources_requests_cpu }}
+      memory: {{ helm_flux_memcached_resources_requests_memory }}
 rbac:
   create: true
 registry:
   pollInterval: 1m
 resources:
   limits:
-    cpu: 400m
-    memory: 1024Mi
+    cpu: {{ helm_flux_resources_limits_cpu }}
+    memory: {{ helm_flux_resources_limits_memory }}
   requests:
-    cpu: 400m
-    memory: 512Mi
+    cpu: {{ helm_flux_resources_requests_cpu }}
+    memory: {{ helm_flux_resources_requests_memory }}
 serviceAccount:
   create: true
 # Optional DNS settings, configuring the ndots option may resolve

@@ -6,6 +6,7 @@ configureRepositories:
       url: https://aws.github.io/eks-charts
     - name: stable
       url: https://kubernetes-charts.storage.googleapis.com
+{% if helm_flux_helm_operator_repositories_tlnd_helm_name is defined and helm_flux_helm_operator_repositories_tlnd_helm_username is defined and helm_flux_helm_operator_repositories_tlnd_helm_password is defined %}
     - caFile: ""
       cache: "{{ helm_flux_helm_operator_repositories_tlnd_helm_name }}-index.yaml"
       certFile: ""
@@ -14,6 +15,7 @@ configureRepositories:
       url: "https://artifactory.datapwn.com/artifactory/{{ helm_flux_helm_operator_repositories_tlnd_helm_name }}"
       username: "{{ helm_flux_helm_operator_repositories_tlnd_helm_username }}"
       password: "{{ helm_flux_helm_operator_repositories_tlnd_helm_password }}"
+{% endif %}
 create: true
 git:
   pollInterval: 1m
@@ -24,11 +26,11 @@ git:
 logFormat: json
 resources:
   limits:
-    cpu: 400m
-    memory: 1024Mi
+    cpu: {{ helm_flux_helm_operator_resources_limits_cpu }}
+    memory: {{ helm_flux_helm_operator_resources_limits_memory }}
   requests:
-    cpu: 400m
-    memory: 1024Mi
+    cpu: {{ helm_flux_helm_operator_resources_requests_cpu }}
+    memory: {{ helm_flux_helm_operator_resources_requests_memory }}
 rbac:
   create: true
 tillerNamespace: "{{ helm_flux_helm_operator_namespace }}"

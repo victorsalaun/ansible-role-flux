@@ -7,6 +7,14 @@ helm_flux_namespace: admin
 helm_flux_release_crd_version: helm-0.10.1
 helm_flux_repositories_values_file: '{{ kube_config_dir }}/{{ helm_flux_chart_name }}-repositories-values.yaml'
 helm_flux_tiller_namespace: admin
+helm_flux_resources_limits_cpu: 400m
+helm_flux_resources_limits_memory: 1024Mi
+helm_flux_resources_requests_cpu: 400m
+helm_flux_resources_requests_memory: 512Mi
+helm_flux_memcached_resources_limits_cpu: 100m
+helm_flux_memcached_resources_limits_memory: 628Mi
+helm_flux_memcached_resources_requests_cpu: 50m
+helm_flux_memcached_resources_requests_memory: 64Mi
 
 helm_flux_helm_operator_chart_name: flux-helm-operator
 helm_flux_helm_operator_chart_repo: fluxcd/helm-operator
@@ -14,6 +22,10 @@ helm_flux_helm_operator_chart_version: "1.0.1"
 helm_flux_helm_operator_crd: "https://raw.githubusercontent.com/fluxcd/helm-operator/chart-{{ helm_flux_helm_operator_chart_version }}/deploy/crds.yaml"
 helm_flux_helm_operator_namespace: admin
 helm_flux_helm_operator_repositories_tlnd_helm_name: tlnd-helm-dev
+helm_flux_helm_operator_resources_limits_cpu: 400m
+helm_flux_helm_operator_resources_limits_memory: 1024Mi
+helm_flux_helm_operator_resources_requests_cpu: 400m
+helm_flux_helm_operator_resources_requests_memory: 1024Mi
 
 helm_fluxcloud_application_config_repository_git_url: https://github.com/Talend/application-flux-config
 helm_fluxcloud_docker_image_tag: v0.3.9
@@ -24,3 +36,7 @@ helm_sealed_secrets_chart_name: sealed-secrets
 helm_sealed_secrets_chart_repo: stable/sealed-secrets
 helm_sealed_secrets_chart_version: "1.5.0"
 helm_sealed_secrets_namespace: admin
+helm_sealed_secrets_resources_limits_cpu: 50m
+helm_sealed_secrets_resources_limits_memory: 64Mi
+helm_sealed_secrets_resources_requests_cpu: 50m
+helm_sealed_secrets_resources_requests_memory: 64Mi

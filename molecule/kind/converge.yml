@@ -4,7 +4,20 @@
   gather_facts: false
 
   vars:
+    ansible_python_interpreter: '/usr/bin/python3'
     cluster_name: vsalaun
+      helm_flux_resources_limits_cpu: 100m
+      helm_flux_resources_limits_memory: 124Mi
+      helm_flux_resources_requests_cpu: 50m
+      helm_flux_resources_requests_memory: 64Mi
+      helm_flux_memcached_resources_limits_cpu: 100m
+      helm_flux_memcached_resources_limits_memory: 124Mi
+      helm_flux_memcached_resources_requests_cpu: 50m
+      helm_flux_memcached_resources_requests_memory: 64Mi
+      helm_flux_helm_operator_resources_limits_cpu: 200m
+      helm_flux_helm_operator_resources_limits_memory: 512Mi
+      helm_flux_helm_operator_resources_requests_cpu: 200m
+      helm_flux_helm_operator_resources_requests_memory: 512Mi
 
   roles:
     - role: ansible-role-flux
